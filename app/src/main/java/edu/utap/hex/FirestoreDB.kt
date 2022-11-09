@@ -1,0 +1,72 @@
+package edu.utap.hex
+
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import edu.utap.hex.model.ChatRow
+import edu.utap.hex.model.FirestoreGame
+
+object FirestoreDB {
+    private const val TAG = "FirestoreDB"
+    private const val allGamesCollection = "allGames"
+    private const val chatCollection = "chat"
+    private val games = FirebaseFirestore
+        .getInstance()
+        .collection(allGamesCollection)
+    private var currentGameID = ""
+    private var chatList : MutableLiveData<List<ChatRow>>? = null
+    private var gameList : MutableLiveData<List<FirestoreGame>>? = null
+
+    private fun redoChatQuery() {
+        if(currentGameID.isEmpty()) {
+            chatList?.postValue(listOf())
+        } else {
+            listenChat(chatList)
+        }
+    }
+    fun updateChatList(newList: MutableLiveData<List<ChatRow>>) {
+        if(chatList != newList) {
+            chatList = newList
+            redoChatQuery()
+        }
+    }
+    fun updateGameList(newList: MutableLiveData<List<FirestoreGame>>) {
+        gameList = newList
+        listenGameList()
+    }
+    // Can't use live data since we don't have a lifecycle, so build
+    // our own.
+    fun setCurrentGameID(id: String) {
+        if(id != currentGameID) {
+            currentGameID = id
+            if(chatList != null) {
+                redoChatQuery()
+            }
+        }
+    }
+    private fun listenGameList() {
+        val uid = FirebaseAuth.getInstance().uid ?: return
+        // XXX Write me.
+    }
+    private fun listenChat(chatList : MutableLiveData<List<ChatRow>>?) {
+        // XXX Write me.
+    }
+    fun saveChatRow(chatRow: ChatRow) {
+        if (currentGameID.isEmpty()) {
+            return
+        }
+        Log.d("FirestoreDB","saveChatRow ownerUid(${chatRow.ownerUid})")
+        // XXX Write me.
+        // https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
+    }
+    fun updateMoves(game: HexGame) {
+        assert(currentGameID.isNotEmpty())
+        // XXX Write me.
+    }
+
+    fun createGame(hexGame: HexGame) {
+        // XXX Write me
+    }
+}
