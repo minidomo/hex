@@ -11,8 +11,8 @@ import edu.utap.hex.databinding.RowGameBinding
 import edu.utap.hex.model.FirestoreGame
 import java.util.*
 
-class FirestoreGameAdapter(val gamePicked: (FirestoreGame)->Unit)
-    : ListAdapter<FirestoreGame, FirestoreGameAdapter.VH>(Diff()) {
+class FirestoreGameAdapter(val gamePicked: (FirestoreGame) -> Unit) :
+    ListAdapter<FirestoreGame, FirestoreGameAdapter.VH>(Diff()) {
     // This class allows the adapter to compute what has changed
     class Diff : DiffUtil.ItemCallback<FirestoreGame>() {
         override fun areItemsTheSame(oldItem: FirestoreGame, newItem: FirestoreGame): Boolean {
@@ -56,6 +56,15 @@ class FirestoreGameAdapter(val gamePicked: (FirestoreGame)->Unit)
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         // XXX Write me.  Let's bind
+        val game = getItem(position)
+        val binding = holder.rowGameBinding
+
+        binding.redUserName.text = game.playerNameList[0]
+        binding.blueUserName.text = game.playerNameList[1]
+
+        game.timeStamp?.let {
+            binding.date.text = dateFormat.format(it.toDate())
+        }
     }
 }
 

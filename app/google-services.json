@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "762667771627",
+    "project_id": "hwhex-44643",
+    "storage_bucket": "hwhex-44643.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:762667771627:android:ad0bb58ea952d0801a40ae",
+        "android_client_info": {
+          "package_name": "edu.utap.hex"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "762667771627-hck674ac0eltufimub41pa1ha7hkkf35.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.utap.hex",
+            "certificate_hash": "fb3890c99d38e37a9a12d95d8dd3f951c0c54f9d"
+          }
+        },
+        {
+          "client_id": "762667771627-rn1s3teusqcpoejubbkkv7bu73ltimdg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5tYT7re9mLfENmfFv_YVVd15l_jDOMwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "762667771627-rn1s3teusqcpoejubbkkv7bu73ltimdg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -121,6 +121,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         // XXX Write me, initialize chatViewMe and chatViewThem as a list
         // of text views.  Look at the game layout
         // XXX Write me, hook up controls
+
+        
     }
 
     // Navigation handled here
