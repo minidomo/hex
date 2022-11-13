@@ -158,10 +158,10 @@ class HexBoard(val boardDim : Int) {
         for(col in 0 until boardDim) {
             boardView.add(mutableListOf())
             for( row in 0 until boardDim) {
-                Log.d("begin", "$col $row")
+//                Log.d("begin", "$col $row")
                 boardView[col].add(
                     HexagonDisplay(col, row, viewModel, frameLayout))
-                Log.d("observe", "$col $row")
+//                Log.d("observe", "$col $row")
             }
         }
         redrawBoardView()
@@ -176,7 +176,7 @@ class HexBoard(val boardDim : Int) {
         // Include borders
         for(row in 0 until boardDim) {
             for (col in 0 until boardDim) {
-                Log.d("clearFinishedGame", "$col $row ${board[col][row]}")
+//                Log.d("clearFinishedGame", "$col $row ${board[col][row]}")
                 boardView[col][row].newState(board[col][row])
             }
         }

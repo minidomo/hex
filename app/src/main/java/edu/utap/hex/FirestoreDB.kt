@@ -53,6 +53,28 @@ object FirestoreDB {
     private fun listenGameList() {
         val uid = FirebaseAuth.getInstance().uid ?: return
         // XXX Write me.
+        games.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.d(TAG, "fail - snapshot")
+                return@addSnapshotListener
+            }
+
+            snapshot?.also {
+                val list = snapshot.documents
+                    .filter {
+                        if (it.exists()) {
+                            val uids = it["playerUidList"] as List<String>
+                            uids.contains(uid)
+                        } else {
+                            false
+                        }
+                    }
+                    .mapNotNull { it.toObject(FirestoreGame::class.java) }
+                    .sortedByDescending { it.timeStamp }
+
+                gameList?.postValue(list)
+            }
+        }
     }
 
     private fun listenChat(chatList: MutableLiveData<List<ChatRow>>?) {
@@ -66,6 +88,18 @@ object FirestoreDB {
         Log.d("FirestoreDB", "saveChatRow ownerUid(${chatRow.ownerUid})")
         // XXX Write me.
         // https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
+        val chats = games.document(currentGameID).collection(chatCollection)
+
+        val doc = chats.document()
+        chatRow.firestoreID = doc.id
+
+        doc.set(chatRow)
+            .addOnSuccessListener {
+                Log.d(TAG, "success - chat")
+            }
+            .addOnFailureListener {
+                Log.d(TAG, "fail - chat")
+            }
     }
 
     fun updateMoves(game: HexGame) {
@@ -85,6 +119,7 @@ object FirestoreDB {
         // XXX Write me
         val doc = games.document()
         val game = hexGame.toFirestoreGame()
+
         game.firestoreID = doc.id
         currentGameID = doc.id
 

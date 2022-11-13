@@ -1,5 +1,6 @@
 package edu.utap.hex.ui
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import edu.utap.hex.FirestoreDB
 import edu.utap.hex.MainActivity
 import edu.utap.hex.MainViewModel
@@ -69,10 +71,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
     private fun initPreviousGamesView() {
         val rv = binding.previousGamesView
-        rv.addItemDecoration(DividerItemDecoration(rv.context, rv.layoutDirection))
 
         rv.adapter = firestoreGameAdapter
-        firestoreGameAdapter.submitList(firestoreGameList.value)
+        FirestoreDB.updateGameList(firestoreGameList)
+
+        firestoreGameList.observe(viewLifecycleOwner) {
+            firestoreGameAdapter.submitList(it)
+        }
     }
 
     private fun gamePicked(game: FirestoreGame) {
