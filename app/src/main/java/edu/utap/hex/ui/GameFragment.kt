@@ -53,6 +53,30 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     private fun replayGameView() {
         // XXX Write me, replay view
+        binding.beginGame.visibility = View.VISIBLE
+        binding.prevMove.visibility = View.VISIBLE
+        binding.nextMove.visibility = View.VISIBLE
+        binding.endGame.visibility = View.VISIBLE
+
+        val game = viewModel.game()
+
+        setReplayDate(game.replayTimestamp())
+
+        binding.beginGame.setOnClickListener {
+            game.startChosenReplayGame()
+        }
+
+        binding.prevMove.setOnClickListener {
+            game.replayMovePrev()
+        }
+
+        binding.nextMove.setOnClickListener {
+            game.replayMoveNext()
+        }
+
+        binding.endGame.setOnClickListener {
+            game.replayGameEnd()
+        }
     }
 
     private fun interactiveGameView() {
@@ -113,6 +137,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     private fun startReplayGame() {
         // XXX Write me, deal with view and call doReplayGameBegin
+        replayGameView()
+        interactiveGameView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -82,6 +82,13 @@ class MainViewModel : ViewModel() {
 
     fun playReplayGame(firestoreGame: FirestoreGame) {
         // XXX Write me
+        hexGame.clearReplayGame()
+        val redHexPlayer =
+            HexPlayer(firestoreGame.playerNameList[0], firestoreGame.playerUidList[0], "")
+        val blueHexPlayer =
+            HexPlayer(firestoreGame.playerNameList[1], firestoreGame.playerUidList[1], "")
+
+        hexGame.startReplayGame(firestoreGame, redHexPlayer, blueHexPlayer)
     }
 
     fun doTurn() {

@@ -1,16 +1,13 @@
 package edu.utap.hex.ui
 
-import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import edu.utap.hex.FirestoreDB
 import edu.utap.hex.MainActivity
 import edu.utap.hex.MainViewModel
@@ -82,6 +79,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
     private fun gamePicked(game: FirestoreGame) {
         Log.d(javaClass.simpleName, "game: ${game.firestoreID}")
+        viewModel.playReplayGame(game)
+
+        val bundle = bundleOf(Pair("replay", true))
+        findNavController().navigate(R.id.action_navigation_dashboard_to_navigation_game, bundle)
     }
 
     override fun onDestroyView() {
