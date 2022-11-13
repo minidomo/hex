@@ -99,6 +99,14 @@ class HexGame {
         _firstMove: GameState
     ) {
         // XXX Write me, initial state, create in firestore if not replay game
+        firstMove = _firstMove
+        redPlayer = _redPlayer
+        bluePlayer = _bluePlayer
+        gameState.value = _firstMove
+
+        if (!isReplayGame()) {
+            FirestoreDB.createGame(this)
+        }
     }
 
     private fun whoseReplayTurn(givenMoveNumber: Int): GameState {
@@ -139,9 +147,24 @@ class HexGame {
 
     fun makeMove(col: Int, row: Int) {
         // XXX Write me
-        gameState.value?.let {
-            if (it == GameState.NotPlaying) return
+        var hexState = HexState.Invalid
+        gameState.value?.also {
+            when (it) {
+                GameState.RedTurn -> hexState = HexState.Red
+                GameState.BlueTurn -> hexState = HexState.Blue
+                else -> {
+                    badPress.value = false
+                    return
+                }
+            }
         }
+
+        if (!legalMove(col, row)) {
+            badPress.value = false
+            return
+        }
+
+        hexBoard.update(col, row, hexState)
 
         Log.d("makeMove", "XXX col $col row $row val ${hexBoard.read(col, row)}")
         if (!isReplayGame()) {
@@ -223,6 +246,7 @@ class HexGame {
     // Is this move legal?
     fun legalMove(col: Int, row: Int): Boolean {
         // XXX Write me.
-        return false
+        val state = hexBoard.read(col, row)
+        return state == HexState.Unclaimed
     }
 }

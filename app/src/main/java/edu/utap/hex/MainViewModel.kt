@@ -5,7 +5,9 @@ import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Color
+import android.util.Log
 import android.view.View
+import androidx.core.animation.doOnEnd
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,26 +27,34 @@ class MainViewModel : ViewModel() {
     fun observeBluePlayer(): LiveData<String> {
         return bluePlayer
     }
+
     fun observeRedPlayer(): LiveData<String> {
         return redPlayer
     }
+
     // Everyone should use our random object
-    fun random() : Random {
+    fun random(): Random {
         return random
     }
 
     // A display task, but done in multiple places
     fun flashBackground(view: View) {
-        val colorToWarn : Animator = ValueAnimator
+        val colorToWarn: Animator = ValueAnimator
             .ofObject(ArgbEvaluator(), Color.TRANSPARENT, Color.RED)
-            .apply{duration = 70} // milliseconds
-            .apply{addUpdateListener { animator ->
-                view.setBackgroundColor(animator.animatedValue as Int) }}
+            .apply { duration = 70 } // milliseconds
+            .apply {
+                addUpdateListener { animator ->
+                    view.setBackgroundColor(animator.animatedValue as Int)
+                }
+            }
         val colorFromWarn = ValueAnimator
             .ofObject(ArgbEvaluator(), Color.RED, Color.TRANSPARENT)
-            .apply{duration = 100}
-            .apply{addUpdateListener { animator ->
-                view.setBackgroundColor(animator.animatedValue as Int) }}
+            .apply { duration = 100 }
+            .apply {
+                addUpdateListener { animator ->
+                    view.setBackgroundColor(animator.animatedValue as Int)
+                }
+            }
         val animatorSet = AnimatorSet()
         animatorSet.playSequentially(
             colorToWarn,
@@ -55,20 +65,33 @@ class MainViewModel : ViewModel() {
 
     fun startAIGame() {
         hexGame.clearReplayGame()
-        val redHexPlayer : HexPlayer
-        val blueHexPlayer : HexPlayer
+        val redHexPlayer = HexPlayer.aiPlayer()
+        val blueHexPlayer: HexPlayer
+
+        firebaseAuthLiveData.value?.also {
+            blueHexPlayer = HexPlayer(it.displayName!!, it.uid, it.email!!)
+
+            redPlayer.value = redHexPlayer.name
+            bluePlayer.value = blueHexPlayer.name
+
+            val first = arrayOf(GameState.RedTurn, GameState.BlueTurn).random(random)
+            hexGame.startGame(redHexPlayer, blueHexPlayer, first)
+        }
         // XXX Write me
     }
-    fun playReplayGame(firestoreGame : FirestoreGame) {
+
+    fun playReplayGame(firestoreGame: FirestoreGame) {
         // XXX Write me
     }
+
     fun doTurn() {
         assert(!hexGame.isReplayGame())
         hexGame.doTurn(this)
     }
+
     // Allowing this to escape encapsulation so we don't indirect
     // a bunch of methods through the view model
-    fun game() : HexGame {
+    fun game(): HexGame {
         return hexGame
     }
 
@@ -77,29 +100,36 @@ class MainViewModel : ViewModel() {
         hexGame.clearReplayGame()
     }
 
-    fun isBorderLabeled() : Boolean {
+    fun isBorderLabeled(): Boolean {
         return isBorderLabeled
     }
-    fun isInteriorLabeled() : Boolean {
+
+    fun isInteriorLabeled(): Boolean {
         return isInteriorLabeled
     }
+
     fun setBorderLabeled(value: Boolean) {
         isBorderLabeled = value
     }
+
     fun setInteriorLabeled(value: Boolean) {
         isInteriorLabeled = value
     }
+
     /////////////////////////////////////////////////////////////
     // Authentication
     fun updateUser() {
         firebaseAuthLiveData.updateUser()
     }
-    fun currentUser() :FirebaseUser {
+
+    fun currentUser(): FirebaseUser {
         return firebaseAuthLiveData.currentUser()
     }
+
     fun signOut() {
         firebaseAuthLiveData.signOut()
     }
+
     fun observeFirebaseAuthLiveData(): LiveData<FirebaseUser?> {
         return firebaseAuthLiveData
     }

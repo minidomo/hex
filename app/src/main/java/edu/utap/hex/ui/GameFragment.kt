@@ -101,10 +101,16 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     private fun redTurn() {
         // XXX Write me
+        binding.turnIndicator.setBackgroundColor(HexagonDisplay.redColor)
+        val str = viewModel.game().moveNumber().toString()
+        binding.turnIndicator.text = str
     }
 
     private fun blueTurn() {
         // XXX Write me
+        binding.turnIndicator.setBackgroundColor(HexagonDisplay.blueColor)
+        val str = viewModel.game().moveNumber().toString()
+        binding.turnIndicator.text = str
     }
 
     private fun startReplayGame() {
@@ -162,11 +168,31 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 binding.redPlayerTV.text = it
             }
 
+        viewModel.game()
+            .observeGameState()
+            .observe(viewLifecycleOwner) {
+                when (it!!) {
+                    GameState.BlueTurn -> blueTurn()
+                    GameState.RedTurn -> redTurn()
+                    GameState.BlueWon -> blueWon()
+                    GameState.RedWon -> redWon()
+                    GameState.NotPlaying -> notPlaying()
+                }
+
+                viewModel.doTurn()
+            }
+
+        viewModel.game()
+            .observeBadPress()
+            .observe(viewLifecycleOwner) {
+                Log.d(javaClass.simpleName, "flashing")
+                viewModel.flashBackground(binding.playArea)
+            }
+
         binding.playAI.setOnClickListener {
-            Log.d(javaClass.simpleName, "play ai pressed")
+            viewModel.startAIGame()
         }
 
-        notPlaying()
         viewModel.game().makeView(binding.playArea, viewModel)
     }
 
