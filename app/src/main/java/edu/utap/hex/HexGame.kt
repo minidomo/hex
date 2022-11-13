@@ -139,6 +139,9 @@ class HexGame {
 
     fun makeMove(col: Int, row: Int) {
         // XXX Write me
+        gameState.value?.let {
+            if (it == GameState.NotPlaying) return
+        }
 
         Log.d("makeMove", "XXX col $col row $row val ${hexBoard.read(col, row)}")
         if (!isReplayGame()) {

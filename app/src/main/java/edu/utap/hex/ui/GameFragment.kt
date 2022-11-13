@@ -26,6 +26,7 @@ import java.util.*
 
 class GameFragment : Fragment(R.layout.fragment_game) {
     private var _binding: FragmentGameBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -34,27 +35,33 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         SimpleDateFormat("MM-dd-yyyy hh:mm:ss", Locale.US)
     private val lightGray = Color.parseColor("#ededed")
 
-    private fun pxFromDp(context: Context, dp :Int): Float {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-            dp.toFloat(), context.resources.displayMetrics)
+    private fun pxFromDp(context: Context, dp: Int): Float {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp.toFloat(), context.resources.displayMetrics
+        )
     }
-    private lateinit var chatViewMe : List<TextView>
-    private lateinit var chatViewThem : List<TextView>
+
+    private lateinit var chatViewMe: List<TextView>
+    private lateinit var chatViewThem: List<TextView>
 
     private fun setReplayDate(timestamp: Timestamp?) {
-        if(timestamp != null) {
+        if (timestamp != null) {
             val date = timestamp.toDate()
             Log.d("replay", "${dateFormat.format(date)}")
             binding.replayDate.text = dateFormat.format(date)
         }
     }
+
     private fun replayGameView() {
         // XXX Write me, replay view
     }
+
     private fun interactiveGameView() {
         // XXX Write me, interactive view
     }
-    private fun showChatRow(i: Int, row : ChatRow) {
+
+    private fun showChatRow(i: Int, row: ChatRow) {
         if (row.ownerUid == viewModel.currentUser().uid) {
             Log.d("showChatRow", "me $i")
             // We are on the right
@@ -69,6 +76,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             chatViewThem[i].setBackgroundColor(Color.TRANSPARENT)
         }
     }
+
     private fun notPlaying() {
         binding.turnIndicator.setBackgroundColor(Color.DKGRAY)
         // Make message a bit smaller so it fits in the button
@@ -77,20 +85,24 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         ss.setSpan(RelativeSizeSpan(0.75f), 0, str.length, 0) // set size
         binding.turnIndicator.text = ss
     }
+
     private fun redWon() {
         binding.turnIndicator.setBackgroundColor(Color.DKGRAY)
         val str = "Red won (${viewModel.game().moveNumber()})"
         binding.turnIndicator.text = str
     }
+
     private fun blueWon() {
         binding.turnIndicator.setBackgroundColor(Color.DKGRAY)
         // Make message a bit smaller so it fits in the button
         val str = "Blue won (${viewModel.game().moveNumber()})"
         binding.turnIndicator.text = str
     }
+
     private fun redTurn() {
         // XXX Write me
     }
+
     private fun blueTurn() {
         // XXX Write me
     }
@@ -106,7 +118,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         val chatList = MutableLiveData<List<ChatRow>>()
         val lp = binding.playArea.layoutParams
         // Should improve this.  My formula doesn't take into account overlap
-        lp.height = 68*boardDim //boardDim * pxFromDp(view.context, HexagonDisplay.hexDimDP)
+        lp.height = 68 * boardDim //boardDim * pxFromDp(view.context, HexagonDisplay.hexDimDP)
         binding.playArea.layoutParams = lp
 
         // TODO: Two player games
@@ -114,15 +126,48 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             viewModel.game().clearBoard()
             interactiveGameView()
             viewModel.startPersonGame()
-            Snackbar.make(binding.root,
+            Snackbar.make(
+                binding.root,
                 "Person vs. Person play is not supported.\nOnly Person vs. AI is supported",
-                Snackbar.LENGTH_LONG).show()
+                Snackbar.LENGTH_LONG
+            ).show()
         }
         // XXX Write me, initialize chatViewMe and chatViewThem as a list
         // of text views.  Look at the game layout
         // XXX Write me, hook up controls
 
-        
+        chatViewMe = listOf(
+            binding.chatLine0Me,
+            binding.chatLine1Me,
+            binding.chatLine2Me,
+            binding.chatLine3Me,
+        )
+
+        chatViewThem = listOf(
+            binding.chatLine0Them,
+            binding.chatLine1Them,
+            binding.chatLine2Them,
+            binding.chatLine3Them,
+        )
+
+        viewModel
+            .observeBluePlayer()
+            .observe(viewLifecycleOwner) {
+                binding.bluePlayerTV.text = it
+            }
+
+        viewModel
+            .observeRedPlayer()
+            .observe(viewLifecycleOwner) {
+                binding.redPlayerTV.text = it
+            }
+
+        binding.playAI.setOnClickListener {
+            Log.d(javaClass.simpleName, "play ai pressed")
+        }
+
+        notPlaying()
+        viewModel.game().makeView(binding.playArea, viewModel)
     }
 
     // Navigation handled here
@@ -140,6 +185,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         args.clear()
         Log.d("GameFragment", "onResume")
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

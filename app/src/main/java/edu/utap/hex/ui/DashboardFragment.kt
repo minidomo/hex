@@ -55,12 +55,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             mainActivity.signOut()
         }
 
+        binding.borderHexagonsSwitch.isChecked = viewModel.isBorderLabeled()
         binding.borderHexagonsSwitch.setOnClickListener {
-            Log.d(javaClass.simpleName, "border hex switch")
+            viewModel.setBorderLabeled(binding.borderHexagonsSwitch.isChecked)
         }
 
         binding.interiorHexagonsSwitch.setOnClickListener {
-            Log.d(javaClass.simpleName, "interior hex switch")
+            viewModel.setInteriorLabeled(binding.interiorHexagonsSwitch.isChecked)
         }
 
         initPreviousGamesView()
