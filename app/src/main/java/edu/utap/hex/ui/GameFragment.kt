@@ -142,6 +142,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         // of text views.  Look at the game layout
         // XXX Write me, hook up controls
 
+        val game = viewModel.game()
+
         chatViewMe = listOf(
             binding.chatLine0Me,
             binding.chatLine1Me,
@@ -168,8 +170,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 binding.redPlayerTV.text = it
             }
 
-        viewModel.game()
-            .observeGameState()
+        game.observeGameState()
             .observe(viewLifecycleOwner) {
                 when (it!!) {
                     GameState.BlueTurn -> blueTurn()
@@ -182,8 +183,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 viewModel.doTurn()
             }
 
-        viewModel.game()
-            .observeBadPress()
+        game.observeBadPress()
             .observe(viewLifecycleOwner) {
                 Log.d(javaClass.simpleName, "flashing")
                 viewModel.flashBackground(binding.playArea)
@@ -193,7 +193,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             viewModel.startAIGame()
         }
 
-        viewModel.game().makeView(binding.playArea, viewModel)
+        game.makeView(binding.playArea, viewModel)
     }
 
     // Navigation handled here

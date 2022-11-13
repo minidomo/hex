@@ -102,11 +102,16 @@ class HexGame {
         firstMove = _firstMove
         redPlayer = _redPlayer
         bluePlayer = _bluePlayer
-        gameState.value = _firstMove
 
         if (!isReplayGame()) {
             FirestoreDB.createGame(this)
         }
+
+        moveNumber = 0
+        moves.clear()
+        clearBoard()
+
+        gameState.value = _firstMove
     }
 
     private fun whoseReplayTurn(givenMoveNumber: Int): GameState {
