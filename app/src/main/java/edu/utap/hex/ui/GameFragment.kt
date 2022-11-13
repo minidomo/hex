@@ -31,14 +31,12 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
-    private val dateFormat =
-        SimpleDateFormat("MM-dd-yyyy hh:mm:ss", Locale.US)
+    private val dateFormat = SimpleDateFormat("MM-dd-yyyy hh:mm:ss", Locale.US)
     private val lightGray = Color.parseColor("#ededed")
 
     private fun pxFromDp(context: Context, dp: Int): Float {
         return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            dp.toFloat(), context.resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), context.resources.displayMetrics
         )
     }
 
@@ -158,39 +156,41 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             binding.chatLine3Them,
         )
 
-        viewModel
-            .observeBluePlayer()
-            .observe(viewLifecycleOwner) {
-                binding.bluePlayerTV.text = it
+        viewModel.observeBluePlayer().observe(viewLifecycleOwner) {
+            binding.bluePlayerTV.text = it
+        }
+
+        viewModel.observeRedPlayer().observe(viewLifecycleOwner) {
+            binding.redPlayerTV.text = it
+        }
+
+        game.observeGameState().observe(viewLifecycleOwner) {
+            when (it!!) {
+                GameState.BlueTurn -> blueTurn()
+                GameState.RedTurn -> redTurn()
+                GameState.BlueWon -> blueWon()
+                GameState.RedWon -> redWon()
+                GameState.NotPlaying -> notPlaying()
             }
 
-        viewModel
-            .observeRedPlayer()
-            .observe(viewLifecycleOwner) {
-                binding.redPlayerTV.text = it
-            }
+            viewModel.doTurn()
+        }
 
-        game.observeGameState()
-            .observe(viewLifecycleOwner) {
-                when (it!!) {
-                    GameState.BlueTurn -> blueTurn()
-                    GameState.RedTurn -> redTurn()
-                    GameState.BlueWon -> blueWon()
-                    GameState.RedWon -> redWon()
-                    GameState.NotPlaying -> notPlaying()
-                }
-
-                viewModel.doTurn()
-            }
-
-        game.observeBadPress()
-            .observe(viewLifecycleOwner) {
-                Log.d(javaClass.simpleName, "flashing")
-                viewModel.flashBackground(binding.playArea)
-            }
+        game.observeBadPress().observe(viewLifecycleOwner) {
+            Log.d(javaClass.simpleName, "flashing")
+            viewModel.flashBackground(binding.playArea)
+        }
 
         binding.playAI.setOnClickListener {
             viewModel.startAIGame()
+        }
+
+        FirestoreDB.updateChatList(chatList)
+        chatList.observe(viewLifecycleOwner) {
+            val start = (it.size - 4).coerceAtLeast(0)
+            for (i in start until it.size) {
+                showChatRow(i - start, it[i])
+            }
         }
 
         game.makeView(binding.playArea, viewModel)

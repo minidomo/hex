@@ -9,25 +9,24 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
-import edu.utap.hex.FirestoreDB
-import edu.utap.hex.MainActivity
-import edu.utap.hex.MainViewModel
-import edu.utap.hex.R
+import edu.utap.hex.*
 import edu.utap.hex.databinding.FragmentChatBinding
 import edu.utap.hex.model.ChatRow
 
 class ChatFragment : Fragment(R.layout.fragment_chat) {
     private var _binding: FragmentChatBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
-    private lateinit var chatAdapter : ChatAdapter
+    private lateinit var chatAdapter: ChatAdapter
 
     private fun scrollToEnd() {
-        if(_binding == null) return
+        if (_binding == null) return
         (chatAdapter.itemCount - 1).takeIf { it > 0 }?.let(binding.chatRV::smoothScrollToPosition)
     }
+
     private fun initRecyclerView() {
         val mainActivity = requireActivity() as MainActivity
         chatAdapter = ChatAdapter(viewModel, mainActivity)
@@ -37,12 +36,60 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             scrollToEnd()
         }
     }
+
     private fun clearCompose() {
         binding.composeMessageET.text.clear()
     }
+
     private fun initComposeSendIB() {
         // Send message button
         // XXX Write me
+        val sendButton = binding.composeSendIB
+        val game = viewModel.game()
+
+        game.observeGameState().observe(viewLifecycleOwner) {
+            if (it == GameState.NotPlaying) {
+                sendButton.setOnClickListener {
+                    clearCompose()
+                }
+            } else {
+                sendButton.setOnClickListener {
+                    val msg = binding.composeMessageET.text.toString()
+
+                    if (game.isReplayGame()) {
+                        Snackbar.make(
+                            binding.root,
+                            "Can't chat during replay game",
+                            Snackbar.LENGTH_LONG,
+                        ).show()
+                        return@setOnClickListener
+                    }
+
+                    if (msg.isEmpty()) {
+                        Snackbar.make(
+                            binding.root,
+                            "Can't send an empty message",
+                            Snackbar.LENGTH_LONG,
+                        ).show()
+                        return@setOnClickListener
+                    }
+
+                    val user = viewModel.currentUser()
+
+                    val chatRow = ChatRow(
+                        user.displayName,
+                        user.uid,
+                        msg,
+                        moveNumber = game.moveNumber()
+                    )
+
+                    FirestoreDB.saveChatRow(chatRow)
+
+                    clearCompose()
+                    scrollToEnd()
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,15 +108,17 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             // If user has pressed enter, or if they hit the soft keyboard "send" button
             // (which sends DONE because of the XML)
             if ((event != null
-                        &&(event.action == KeyEvent.ACTION_DOWN)
-                        &&(event.keyCode == KeyEvent.KEYCODE_ENTER))
-                || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                        && (event.action == KeyEvent.ACTION_DOWN)
+                        && (event.keyCode == KeyEvent.KEYCODE_ENTER))
+                || (actionId == EditorInfo.IME_ACTION_DONE)
+            ) {
                 (requireActivity() as MainActivity).hideKeyboard()
                 binding.composeSendIB.callOnClick()
             }
             true
         }
     }
+
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()

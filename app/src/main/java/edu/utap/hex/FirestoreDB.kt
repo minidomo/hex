@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import edu.utap.hex.model.ChatRow
 import edu.utap.hex.model.FirestoreGame
 
@@ -12,9 +11,7 @@ object FirestoreDB {
     private const val TAG = "FirestoreDB"
     private const val allGamesCollection = "allGames"
     private const val chatCollection = "chat"
-    private val games = FirebaseFirestore
-        .getInstance()
-        .collection(allGamesCollection)
+    private val games = FirebaseFirestore.getInstance().collection(allGamesCollection)
     private var currentGameID = ""
     private var chatList: MutableLiveData<List<ChatRow>>? = null
     private var gameList: MutableLiveData<List<FirestoreGame>>? = null
@@ -53,14 +50,14 @@ object FirestoreDB {
     private fun listenGameList() {
         val uid = FirebaseAuth.getInstance().uid ?: return
         // XXX Write me.
-        games.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.d(TAG, "fail - snapshot")
+        games.addSnapshotListener { value, error ->
+            if (error != null) {
+                Log.d(TAG, "fail - game snapshot")
                 return@addSnapshotListener
             }
 
-            snapshot?.also {
-                val list = snapshot.documents
+            value?.also {
+                val list = value.documents
                     .filter {
                         if (it.exists()) {
                             val uids = it["playerUidList"] as List<String>
@@ -79,6 +76,22 @@ object FirestoreDB {
 
     private fun listenChat(chatList: MutableLiveData<List<ChatRow>>?) {
         // XXX Write me.
+        val chats = games.document(currentGameID).collection(chatCollection)
+
+        chats.addSnapshotListener { value, error ->
+            if (error != null) {
+                Log.d(TAG, "fail - chat snapshot")
+                return@addSnapshotListener
+            }
+
+            value?.also {
+                val list = value.documents
+                    .mapNotNull { it.toObject(ChatRow::class.java) }
+                    .sortedBy { it.timeStamp }
+
+                chatList?.postValue(list)
+            }
+        }
     }
 
     fun saveChatRow(chatRow: ChatRow) {
@@ -121,11 +134,11 @@ object FirestoreDB {
         val game = hexGame.toFirestoreGame()
 
         game.firestoreID = doc.id
-        currentGameID = doc.id
 
         doc.set(game)
             .addOnSuccessListener {
                 Log.d(TAG, "success - game")
+                setCurrentGameID(doc.id)
             }
             .addOnFailureListener {
                 Log.d(TAG, "fail - game")
