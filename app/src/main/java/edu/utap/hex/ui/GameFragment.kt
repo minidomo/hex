@@ -81,6 +81,15 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     private fun interactiveGameView() {
         // XXX Write me, interactive view
+        binding.beginGame.visibility = View.GONE
+        binding.prevMove.visibility = View.GONE
+        binding.nextMove.visibility = View.GONE
+        binding.endGame.visibility = View.GONE
+        binding.replayDate.text = ""
+
+        for (i in 0 until 4) {
+            resetChatRow(i)
+        }
     }
 
     private fun showChatRow(i: Int, row: ChatRow) {
@@ -97,6 +106,15 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             chatViewThem[i].text = row.message
             chatViewThem[i].setBackgroundColor(Color.TRANSPARENT)
         }
+    }
+
+    private fun resetChatRow(i: Int) {
+        chatViewThem[i].visibility = View.VISIBLE
+        chatViewThem[i].text = ""
+        chatViewThem[i].setBackgroundColor(Color.TRANSPARENT)
+        chatViewMe[i].visibility = View.VISIBLE
+        chatViewMe[i].text = ""
+        chatViewMe[i].setBackgroundColor(Color.TRANSPARENT)
     }
 
     private fun notPlaying() {
@@ -137,8 +155,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     private fun startReplayGame() {
         // XXX Write me, deal with view and call doReplayGameBegin
-        replayGameView()
-        interactiveGameView()
+        viewModel.game().startChosenReplayGame()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -196,10 +213,12 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 GameState.RedTurn -> redTurn()
                 GameState.BlueWon -> blueWon()
                 GameState.RedWon -> redWon()
-                GameState.NotPlaying -> notPlaying()
+                GameState.NotPlaying, GameState.CreatingGame -> notPlaying()
             }
 
-            viewModel.doTurn()
+            if (!game.isReplayGame()) {
+                viewModel.doTurn()
+            }
         }
 
         game.observeBadPress().observe(viewLifecycleOwner) {
@@ -208,7 +227,10 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         }
 
         binding.playAI.setOnClickListener {
-            viewModel.startAIGame()
+            if (game.getGameState() != GameState.CreatingGame) {
+                interactiveGameView()
+                viewModel.startAIGame()
+            }
         }
 
         FirestoreDB.updateChatList(chatList)
@@ -220,6 +242,10 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         }
 
         game.makeView(binding.playArea, viewModel)
+
+        if (game.isReplayGame()) {
+            replayGameView()
+        }
     }
 
     // Navigation handled here

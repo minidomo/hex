@@ -47,13 +47,12 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         val sendButton = binding.composeSendIB
         val game = viewModel.game()
 
-        game.observeGameState().observe(viewLifecycleOwner) {
-            if (it == GameState.NotPlaying) {
-                sendButton.setOnClickListener {
+        sendButton.setOnClickListener {
+            when (game.getGameState()) {
+                GameState.NotPlaying, GameState.CreatingGame -> {
                     clearCompose()
                 }
-            } else {
-                sendButton.setOnClickListener {
+                else -> {
                     val msg = binding.composeMessageET.text.toString()
 
                     if (game.isReplayGame()) {

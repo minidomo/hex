@@ -128,7 +128,10 @@ object FirestoreDB {
             }
     }
 
-    fun createGame(hexGame: HexGame, onSuccess: () -> Unit) {
+    /**
+     * @modified added result callback parameter
+     */
+    fun createGame(hexGame: HexGame, result: (success: Boolean) -> Unit) {
         // XXX Write me
         val doc = games.document()
         val game = hexGame.toFirestoreGame()
@@ -139,10 +142,11 @@ object FirestoreDB {
             .addOnSuccessListener {
                 Log.d(TAG, "success - game")
                 setCurrentGameID(doc.id)
-                onSuccess()
+                result(true)
             }
             .addOnFailureListener {
                 Log.d(TAG, "fail - game")
+                result(false)
             }
     }
 }

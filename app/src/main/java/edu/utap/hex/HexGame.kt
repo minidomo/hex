@@ -8,13 +8,11 @@ import com.google.firebase.Timestamp
 import edu.utap.hex.HexStrategy.Companion.aiMove
 import edu.utap.hex.model.FirestoreGame
 
+/**
+ * @modified added CreatingGame state
+ */
 enum class GameState(val value: Int) {
-    NotPlaying(0),
-    RedTurn(1),
-    BlueTurn(2),
-    RedWon(3),
-    BlueWon(4),
-    ;
+    NotPlaying(0), RedTurn(1), BlueTurn(2), RedWon(3), BlueWon(4), CreatingGame(5), ;
 
     companion object {
         private val map = values().associateBy(GameState::value)
@@ -92,13 +90,18 @@ class HexGame {
         return badPress
     }
 
+    fun getGameState(): GameState {
+        return gameState.value!!
+    }
+
     //////////////////////////////////////////////////////////////////////
     // Game dynamics
     fun startGame(
-        _redPlayer: HexPlayer, _bluePlayer: HexPlayer,
-        _firstMove: GameState
+        _redPlayer: HexPlayer, _bluePlayer: HexPlayer, _firstMove: GameState
     ) {
         // XXX Write me, initial state, create in firestore if not replay game
+        gameState.value = GameState.CreatingGame
+
         firstMove = _firstMove
         redPlayer = _redPlayer
         bluePlayer = _bluePlayer
@@ -107,9 +110,15 @@ class HexGame {
         moves.clear()
         clearBoard()
 
-        if (!isReplayGame()) {
-            FirestoreDB.createGame(this) {
-                gameState.value = _firstMove
+        if (isReplayGame()) {
+            gameState.value = _firstMove
+        } else {
+            FirestoreDB.createGame(this) { success ->
+                if (success) {
+                    gameState.value = _firstMove
+                } else {
+                    gameState.value = GameState.NotPlaying
+                }
             }
         }
     }
@@ -150,13 +159,20 @@ class HexGame {
         }
     }
 
+    private fun turnToHexState(turn: GameState): HexState {
+        return when (turn) {
+            GameState.RedTurn -> HexState.Red
+            GameState.BlueTurn -> HexState.Blue
+            else -> HexState.Invalid
+        }
+    }
+
     fun makeMove(col: Int, row: Int) {
         // XXX Write me
         var hexState = HexState.Invalid
         gameState.value?.also {
             when (it) {
-                GameState.RedTurn -> hexState = HexState.Red
-                GameState.BlueTurn -> hexState = HexState.Blue
+                GameState.RedTurn, GameState.BlueTurn -> hexState = turnToHexState(it)
                 else -> {
                     badPress.value = false
                     return
@@ -199,8 +215,7 @@ class HexGame {
     /////////////////////////////////////////////////////////////
     // Replay games
     fun startReplayGame(
-        firestoreGame: FirestoreGame,
-        redPlayer: HexPlayer, bluePlayer: HexPlayer
+        firestoreGame: FirestoreGame, redPlayer: HexPlayer, bluePlayer: HexPlayer
     ) {
         replayGame = firestoreGame
         FirestoreDB.setCurrentGameID(firestoreGame.firestoreID)
@@ -215,32 +230,72 @@ class HexGame {
 
     private fun nextReplayMove(): BoardPosition? {
         // XXX Write me
-        return null
+        val replayMoves = replayGame!!.moves
+        val index = moveNumber * 2
+
+        return if (index < replayMoves.size) {
+            BoardPosition(
+                replayMoves[index],
+                replayMoves[index + 1]
+            )
+        } else {
+            null
+        }
     }
 
     private fun prevReplayMove(): BoardPosition? {
         // XXX Write me
-        return null
+        val replayMoves = replayGame!!.moves
+        val index = (moveNumber - 1) * 2
+
+        return if (index >= 0) {
+            BoardPosition(
+                replayMoves[index],
+                replayMoves[index + 1]
+            )
+        } else {
+            null
+        }
     }
 
     fun startChosenReplayGame() {
         assert(isReplayGame())
         // XXX Write me
+        var prevMoveNumber = moveNumber + 1
+        while (prevMoveNumber != moveNumber) {
+            prevMoveNumber = moveNumber
+            replayMovePrev()
+        }
     }
 
     fun replayMovePrev() {
         assert(isReplayGame())
         // XXX Write me
+        prevReplayMove()?.also {
+            moveNumber--
+            hexBoard.update(it.first, it.second, HexState.Unclaimed)
+            completeMove()
+        }
     }
 
     fun replayMoveNext() {
         assert(isReplayGame())
         // XXX Write me
+        nextReplayMove()?.also {
+            hexBoard.update(it.first, it.second, turnToHexState(whoseReplayTurn(moveNumber)))
+            moveNumber++
+            completeMove()
+        }
     }
 
     fun replayGameEnd() {
         assert(isReplayGame())
         // XXX Write me
+        var prevMoveNumber = moveNumber - 1
+        while (prevMoveNumber != moveNumber) {
+            prevMoveNumber = moveNumber
+            replayMoveNext()
+        }
     }
 
     fun replayTimestamp(): Timestamp? {
