@@ -65,17 +65,21 @@ class MainViewModel : ViewModel() {
 
     fun startAIGame() {
         hexGame.clearReplayGame()
-        val redHexPlayer = HexPlayer.aiPlayer()
-        val blueHexPlayer: HexPlayer
+        val players = arrayOfNulls<HexPlayer>(2) as Array<HexPlayer>
+
+        val aiIndex = random.nextInt(players.size)
+        val playerIndex = (aiIndex + 1).mod(players.size)
+        players[aiIndex] = HexPlayer.aiPlayer()
 
         firebaseAuthLiveData.value?.also {
-            blueHexPlayer = HexPlayer(it.displayName!!, it.uid, it.email!!)
+            players[playerIndex] =
+                HexPlayer(it.displayName!!, it.uid, it.email!!)
 
-            redPlayer.value = redHexPlayer.name
-            bluePlayer.value = blueHexPlayer.name
+            redPlayer.value = players[0].name
+            bluePlayer.value = players[1].name
 
-            val first = arrayOf(GameState.RedTurn, GameState.BlueTurn).random(random)
-            hexGame.startGame(redHexPlayer, blueHexPlayer, first)
+            val first = if (random.nextBoolean()) GameState.RedTurn else GameState.BlueTurn
+            hexGame.startGame(players[0], players[1], first)
         }
         // XXX Write me
     }
