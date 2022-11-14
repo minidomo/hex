@@ -59,12 +59,10 @@ object FirestoreDB {
             value?.also {
                 val list = value.documents
                     .filter {
-                        if (it.exists()) {
-                            val uids = it["playerUidList"] as List<String>
-                            uids.contains(uid)
-                        } else {
-                            false
-                        }
+                        if (!it.exists()) return@filter false
+
+                        val uids = it["playerUidList"] as List<String>
+                        uids.contains(uid)
                     }
                     .mapNotNull { it.toObject(FirestoreGame::class.java) }
                     .sortedByDescending { it.timeStamp }
@@ -86,6 +84,7 @@ object FirestoreDB {
 
             value?.also {
                 val list = value.documents
+                    .filter { it.exists() }
                     .mapNotNull { it.toObject(ChatRow::class.java) }
                     .sortedBy { it.timeStamp }
 

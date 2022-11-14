@@ -170,6 +170,8 @@ class HexGame {
     fun makeMove(col: Int, row: Int) {
         // XXX Write me
         var hexState = HexState.Invalid
+
+        // check for valid game state
         gameState.value?.also {
             when (it) {
                 GameState.RedTurn, GameState.BlueTurn -> hexState = turnToHexState(it)

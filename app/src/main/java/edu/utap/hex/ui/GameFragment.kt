@@ -62,21 +62,10 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
         setReplayDate(game.replayTimestamp())
 
-        binding.beginGame.setOnClickListener {
-            game.startChosenReplayGame()
-        }
-
-        binding.prevMove.setOnClickListener {
-            game.replayMovePrev()
-        }
-
-        binding.nextMove.setOnClickListener {
-            game.replayMoveNext()
-        }
-
-        binding.endGame.setOnClickListener {
-            game.replayGameEnd()
-        }
+        binding.beginGame.setOnClickListener { game.startChosenReplayGame() }
+        binding.prevMove.setOnClickListener { game.replayMovePrev() }
+        binding.nextMove.setOnClickListener { game.replayMoveNext() }
+        binding.endGame.setOnClickListener { game.replayGameEnd() }
     }
 
     private fun interactiveGameView() {
@@ -86,10 +75,6 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         binding.nextMove.visibility = View.GONE
         binding.endGame.visibility = View.GONE
         binding.replayDate.text = ""
-
-        for (i in 0 until 4) {
-            resetChatRow(i)
-        }
     }
 
     private fun showChatRow(i: Int, row: ChatRow) {
@@ -235,9 +220,17 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
         FirestoreDB.updateChatList(chatList)
         chatList.observe(viewLifecycleOwner) {
-            val start = (it.size - 4).coerceAtLeast(0)
-            for (i in start until it.size) {
-                showChatRow(i - start, it[i])
+            val offset = (it.size - 4).coerceAtLeast(0)
+            var index = 0
+
+            for (i in offset until it.size) {
+                index = i - offset
+                showChatRow(index, it[i])
+            }
+
+            while (index < 4) {
+                resetChatRow(index)
+                index++
             }
         }
 

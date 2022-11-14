@@ -1,5 +1,6 @@
 package edu.utap.hex.ui
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.util.TypedValue
 import android.view.Gravity
@@ -87,6 +88,7 @@ class HexagonDisplay(
         return (row - 1).toString()
     }
 
+    @SuppressLint("SetTextI18n")
     fun newState(hexState: HexState) {
         hexagonMaskView.setStrokeColor(strokeColor(hexState))
         hexagonMaskView.setFillColor(fillColor(hexState))
@@ -111,7 +113,7 @@ class HexagonDisplay(
         if (viewModel.isInteriorLabeled() && isInterior(hexState)) {
             hexagonMaskView.textSize = 12f
             hexagonMaskView.setTextColor(Color.BLACK)
-            "${getColumnLabel()}${getRowLabel()}".also { hexagonMaskView.text = it }
+            hexagonMaskView.text = "${getColumnLabel()}${getRowLabel()}"
         }
 
         hexagonMaskView.invalidate()

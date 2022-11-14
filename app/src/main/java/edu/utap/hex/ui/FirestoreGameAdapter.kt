@@ -59,6 +59,7 @@ class FirestoreGameAdapter(val gamePicked: (FirestoreGame) -> Unit) :
         val game = getItem(position)
         val binding = holder.rowGameBinding
 
+        binding.root.setBackgroundColor(dimGray)
         binding.redUserName.text = game.playerNameList[0]
         binding.blueUserName.text = game.playerNameList[1]
 

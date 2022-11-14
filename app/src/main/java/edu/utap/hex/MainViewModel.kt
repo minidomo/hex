@@ -65,6 +65,7 @@ class MainViewModel : ViewModel() {
 
     fun startAIGame() {
         hexGame.clearReplayGame()
+        // red player index 0, blue player index 1
         val players = arrayOfNulls<HexPlayer>(2) as Array<HexPlayer>
 
         val aiIndex = random.nextInt(players.size)

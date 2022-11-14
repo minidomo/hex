@@ -46,10 +46,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 }
             }
 
-        firestoreGameList.observe(viewLifecycleOwner) {
-            firestoreGameAdapter.submitList(it)
-        }
-
         binding.signOutButton.setOnClickListener {
             mainActivity.signOut()
         }
@@ -59,6 +55,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             viewModel.setBorderLabeled(binding.borderHexagonsSwitch.isChecked)
         }
 
+        binding.interiorHexagonsSwitch.isChecked = viewModel.isInteriorLabeled()
         binding.interiorHexagonsSwitch.setOnClickListener {
             viewModel.setInteriorLabeled(binding.interiorHexagonsSwitch.isChecked)
         }
@@ -68,10 +65,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
     private fun initPreviousGamesView() {
         val rv = binding.previousGamesView
-
         rv.adapter = firestoreGameAdapter
-        FirestoreDB.updateGameList(firestoreGameList)
 
+        FirestoreDB.updateGameList(firestoreGameList)
         firestoreGameList.observe(viewLifecycleOwner) {
             firestoreGameAdapter.submitList(it)
         }
