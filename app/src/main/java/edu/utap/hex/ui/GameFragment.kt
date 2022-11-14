@@ -221,15 +221,15 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         FirestoreDB.updateChatList(chatList)
         chatList.observe(viewLifecycleOwner) {
             val offset = (it.size - 4).coerceAtLeast(0)
-            var index = 0
+            val count = it.size - offset
+            var index = 4 - count
 
-            for (i in offset until it.size) {
-                index = i - offset
-                showChatRow(index, it[i])
+            for (i in 0 until index) {
+                resetChatRow(i)
             }
 
-            while (index < 4) {
-                resetChatRow(index)
+            for (i in offset until it.size) {
+                showChatRow(index, it[i])
                 index++
             }
         }
