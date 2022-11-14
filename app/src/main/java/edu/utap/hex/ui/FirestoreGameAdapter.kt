@@ -1,6 +1,7 @@
 package edu.utap.hex.ui
 
 import android.graphics.Color
+import android.graphics.ColorFilter
 import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -59,7 +60,10 @@ class FirestoreGameAdapter(val gamePicked: (FirestoreGame) -> Unit) :
         val game = getItem(position)
         val binding = holder.rowGameBinding
 
-        binding.root.setBackgroundColor(dimGray)
+        binding.root.background.setTint(dimGray)
+        binding.redUserName.background.setTint(HexagonDisplay.redColor)
+        binding.blueUserName.background.setTint(HexagonDisplay.blueColor)
+
         binding.redUserName.text = game.playerNameList[0]
         binding.blueUserName.text = game.playerNameList[1]
 

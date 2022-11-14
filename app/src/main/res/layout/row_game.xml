@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="4dp"
-    android:background="#C5C5C5"
+    android:background="@drawable/rounded_corner"
     android:orientation="horizontal"
-    android:padding="2dp">
+    android:padding="4dp">
 
     <TextView
         android:id="@+id/date"
@@ -15,6 +15,10 @@
         android:text="date"
         android:textColor="@color/black"
         android:textSize="18sp" />
+
+    <Space
+        android:layout_width="4dp"
+        android:layout_height="0dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -26,22 +30,28 @@
             android:id="@+id/red_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#990033"
-            android:padding="4dp"
+            android:background="@drawable/rounded_corner"
+            android:ellipsize="end"
+            android:lines="1"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
             android:text="red"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
         <Space
             android:layout_width="0dp"
-            android:layout_height="2dp" />
+            android:layout_height="4dp" />
 
         <TextView
             android:id="@+id/blue_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#336699"
-            android:padding="4dp"
+            android:background="@drawable/rounded_corner"
+            android:ellipsize="end"
+            android:lines="1"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
             android:text="blue"
             android:textColor="@color/white"
             android:textSize="18sp" />

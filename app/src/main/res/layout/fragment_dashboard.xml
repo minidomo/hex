@@ -19,6 +19,8 @@
         android:id="@+id/user_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@id/sign_out_button">
 
@@ -33,6 +35,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:orientation="vertical">
 
             <TextView
@@ -42,12 +46,20 @@
                 android:text="user name"
                 android:textSize="18sp" />
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="4dp" />
+
             <TextView
                 android:id="@+id/user_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="email"
                 android:textSize="18sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="4dp" />
 
             <TextView
                 android:id="@+id/user_uuid"
@@ -60,12 +72,21 @@
 
     </LinearLayout>
 
+    <Space
+        android:id="@+id/divider1"
+        android:layout_width="0dp"
+        android:layout_height="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user_info" />
+
     <LinearLayout
         android:id="@+id/settings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/user_info">
+        app:layout_constraintTop_toBottomOf="@+id/divider1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,6 +107,10 @@
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="4dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -109,13 +134,22 @@
 
     </LinearLayout>
 
+    <Space
+        android:id="@+id/divider2"
+        android:layout_width="0dp"
+        android:layout_height="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settings" />
+
     <LinearLayout
         android:id="@+id/previous_games"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings">
+        app:layout_constraintTop_toBottomOf="@+id/divider2">
 
         <TextView
             android:layout_width="wrap_content"
@@ -129,6 +163,7 @@
             android:id="@+id/previous_games_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_margin="8dp"
             android:layout_weight="1"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
