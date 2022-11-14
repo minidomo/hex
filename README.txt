@@ -8,7 +8,7 @@ jbl2563
 johnbladera@utexas.edu
 
 4. How many hours you worked on this assignment:
-14.5 hours
+13.667 hours
 
 5. Slip days:
 0
@@ -20,10 +20,3 @@ None
 None
 
 8. Video demo:
-
-905a 1015a
-415p 805p
-940p 1210a
-840a 1020a
-1210p 140p
-530p 730p
