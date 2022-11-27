@@ -43,6 +43,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                     binding.userName.text = user.displayName
                     binding.userEmail.text = user.email
                     binding.userUuid.text = user.uid
+                    refreshPreviousGameList()
                 }
             }
 
@@ -63,14 +64,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         initPreviousGamesView()
     }
 
-    private fun initPreviousGamesView() {
-        val rv = binding.previousGamesView
-        rv.adapter = firestoreGameAdapter
-
+    private fun refreshPreviousGameList() {
         FirestoreDB.updateGameList(firestoreGameList)
         firestoreGameList.observe(viewLifecycleOwner) {
             firestoreGameAdapter.submitList(it)
         }
+    }
+
+    private fun initPreviousGamesView() {
+        val rv = binding.previousGamesView
+        rv.adapter = firestoreGameAdapter
+
+        refreshPreviousGameList()
     }
 
     private fun gamePicked(game: FirestoreGame) {
