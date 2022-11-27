@@ -23,6 +23,23 @@ class MainViewModel : ViewModel() {
     private var isInteriorLabeled = false
     private val hexGame = HexGame()
     private val random = Random(3)// System.currentTimeMillis())
+    private var mostRecentUser: FirebaseUser? = null
+
+    fun getMostRecentUser(): FirebaseUser? {
+        return mostRecentUser
+    }
+
+    fun setMostRecentUser(user: FirebaseUser?) {
+        mostRecentUser = user
+    }
+
+    fun reset() {
+        hexGame.reset()
+        bluePlayer.value = ""
+        redPlayer.value = ""
+        isBorderLabeled = true
+        isInteriorLabeled = false
+    }
 
     fun observeBluePlayer(): LiveData<String> {
         return bluePlayer

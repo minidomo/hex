@@ -96,6 +96,14 @@ class HexGame {
 
     //////////////////////////////////////////////////////////////////////
     // Game dynamics
+    fun reset() {
+        clearReplayGame()
+        gameState.value = GameState.NotPlaying
+        moveNumber = 0
+        moves.clear()
+        clearBoard()
+    }
+
     fun startGame(
         _redPlayer: HexPlayer, _bluePlayer: HexPlayer, _firstMove: GameState
     ) {

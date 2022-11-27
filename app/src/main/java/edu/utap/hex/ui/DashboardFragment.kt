@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseUser
 import edu.utap.hex.FirestoreDB
 import edu.utap.hex.MainActivity
 import edu.utap.hex.MainViewModel
@@ -40,10 +41,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             .observeFirebaseAuthLiveData()
             .observe(viewLifecycleOwner) {
                 it?.let { user ->
+                    // for some reason, observe is being called twice upon each time this
+                    // fragment's view is created, so we need to account for that to detect whether
+                    // a user performed a sign out and then sign in
+                    // the FirebaseUser object will be the same object for those two calls
+                    if (user != viewModel.getMostRecentUser()) {
+                        // new sign in
+                        viewModel.setMostRecentUser(user)
+                        viewModel.reset()
+                        refreshPreviousGameList()
+                        binding.borderHexagonsSwitch.isChecked = viewModel.isBorderLabeled()
+                        binding.interiorHexagonsSwitch.isChecked = viewModel.isInteriorLabeled()
+                    }
+
                     binding.userName.text = user.displayName
                     binding.userEmail.text = user.email
                     binding.userUuid.text = user.uid
-                    refreshPreviousGameList()
                 }
             }
 
@@ -74,7 +87,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private fun initPreviousGamesView() {
         val rv = binding.previousGamesView
         rv.adapter = firestoreGameAdapter
-
         refreshPreviousGameList()
     }
 
